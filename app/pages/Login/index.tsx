@@ -1,50 +1,27 @@
-import React, { useEffect } from 'react';
+// app/pages/LoginScreen.tsx
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Title, Button } from 'react-native-paper';
-import * as WebBrowser from 'expo-web-browser';
-import { useAuthRequest } from 'expo-auth-session/providers/google';
-import { signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '../../../firebaseConfig';
+import { useOAuth } from '@clerk/clerk-expo';
 
-WebBrowser.maybeCompleteAuthSession();
+export default function LoginScreen() {
+  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
-export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
-  const [request, response, promptAsync] = useAuthRequest({
-    clientId: '762139883302-ij9fj2p0c76s1vj3bemr4tldagmiq9f6a.apps.googleusercontent.com',
-    androidClientId: '762139883302-3da9pemmfdkp2bpt6avbbvedpuupdg5o.apps.googleusercontent.com',
-  });  
-  
-  console.log('🔗 Redirect URI gerado pelo Expo:', request?.redirectUri);
-  
-
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const authResponse = response as any; // <-- ignora tipagem aqui
-  
-      const idToken = authResponse.authentication?.idToken;
-  
-      if (idToken) {
-        const credential = GoogleAuthProvider.credential(idToken);
-        signInWithCredential(auth, credential)
-          .then(() => {
-            console.log('✅ Login Google + Firebase OK');
-            onLogin();
-          })
-          .catch((err) => console.error('Erro ao logar no Firebase:', err));
+  const handleLogin = async () => {
+    try {
+      const { createdSessionId, setActive } = await startOAuthFlow();
+      if (createdSessionId) {
+        await setActive({ session: createdSessionId });
       }
+    } catch (err) {
+      console.error('Erro no login com Google:', err);
     }
-  }, [response]);
-  
+  };
 
   return (
     <View style={styles.container}>
       <Title style={styles.title}>Bem-vindo ao Quebra Galho</Title>
-      <Button
-        mode="contained"
-        onPress={() => promptAsync()}
-        disabled={!request}
-        style={styles.button}
-      >
+      <Button mode="contained" onPress={handleLogin} style={styles.button}>
         Entrar com Google
       </Button>
     </View>

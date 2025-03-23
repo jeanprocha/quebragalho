@@ -1,10 +1,12 @@
-// app/index.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import { StatusBar } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/clerk-expo';
+import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 
 import HomeScreen from './pages/Home';
 import NewRequestScreen from './pages/NewRequest';
@@ -12,7 +14,15 @@ import ProfileScreen from './pages/Profile';
 import LoginScreen from './pages/Login';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+
+const tokenCache = {
+  async getToken(key: string) {
+    return SecureStore.getItemAsync(key);
+  },
+  async saveToken(key: string, value: string) {
+    return SecureStore.setItemAsync(key, value);
+  },
+};
 
 const theme = {
   ...DefaultTheme,
@@ -53,22 +63,22 @@ function MainTabs({ onLogout }: { onLogout: () => void }) {
 }
 
 export default function App() {
-  const [user, setUser] = useState(null);
-
   return (
-    <PaperProvider theme={theme}>
-      <StatusBar backgroundColor="#F5F5F5" barStyle="dark-content" />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
-          <Stack.Screen name="Main">
-            {() => <MainTabs onLogout={() => setUser(null)} />}
-          </Stack.Screen>
-        ) : (
-          <Stack.Screen name="Login">
-            {() => <LoginScreen onLogin={() => setUser({ name: 'Usuário' })} />}
-          </Stack.Screen>
-        )}
-      </Stack.Navigator>
-    </PaperProvider>
+    <ClerkProvider
+      publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}
+      tokenCache={tokenCache}
+    >
+      <PaperProvider theme={theme}>
+        <StatusBar backgroundColor="#F5F5F5" barStyle="dark-content" />
+        <NavigationContainer>
+          <SignedIn>
+            <MainTabs onLogout={() => {}} />
+          </SignedIn>
+          <SignedOut>
+            <LoginScreen />
+          </SignedOut>
+        </NavigationContainer>
+      </PaperProvider>
+    </ClerkProvider>
   );
 }

@@ -1,52 +1,30 @@
 {
   "expo": {
-    "name": "Vizinhos App MVP",
+    "name": "quebragalho",
     "slug": "quebragalho",
+    "owner": "jeanprocha",
+    "scheme": "quebragalho",
     "version": "1.0.0",
-    "sdkVersion": "50.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
+    "icon": "./assets/images/adaptive-icon.png",
+    "splash": {
+      "image": "./assets/images/adaptive-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "android": {
+      "package": "com.jeanprocha.quebragalho",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.jeanprocha.quebragalho"
+        "backgroundColor": "#FFFFFF"
+      }
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
+    "plugins": [],
     "extra": {
-      "router": {
-        "origin": false
-      },
+      "clerkPublishableKey": "YOUR_CLERK_PUBLISHABLE_KEY",
       "eas": {
         "projectId": "87913637-9d7f-4a79-b841-ed25ed696189"
       }
-    },
-    "owner": "jeanprocha"
+    }
   }
 }
